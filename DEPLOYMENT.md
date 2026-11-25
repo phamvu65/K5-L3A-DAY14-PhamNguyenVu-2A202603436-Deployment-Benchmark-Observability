@@ -1,7 +1,7 @@
 # Deployment Information
 
 ## Public URL
-https://k5-day14-production-agent.onrender.com
+https://k5-day14-production-agent-m4nh.onrender.com
 
 ## Platform
 Render Blueprint (`render.yaml` — Docker Web Service `k5-day14-production-agent` + Managed Key Value Redis `k5-day14-redis`)
@@ -11,16 +11,16 @@ Render Blueprint (`render.yaml` — Docker Web Service `k5-day14-production-agen
 Đặt biến môi trường trước khi kiểm tra:
 
 ```bash
-export BASE="https://k5-day14-production-agent.onrender.com"
+export BASE="https://k5-day14-production-agent-m4nh.onrender.com"
 export AGENT_API_KEY="<your-render-generated-agent-api-key>"
 ```
 
 ### 1. Liveness Probe (`GET /health` → HTTP 200)
 ```bash
 curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/health"
-# Expected: 200
+# Output: 200
 ```
-**Output thực tế từ `https://k5-day14-production-agent.onrender.com/health`:**
+**Response JSON thực tế:**
 ```json
 {"status":"ok","environment":"production"}
 ```
@@ -28,9 +28,9 @@ curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/health"
 ### 2. Readiness Probe (`GET /ready` → HTTP 200 khi Redis đã kết nối)
 ```bash
 curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/ready"
-# Expected: 200
+# Output: 200
 ```
-**Output thực tế từ `https://k5-day14-production-agent.onrender.com/ready`:**
+**Response JSON thực tế:**
 ```json
 {"status":"ready","redis":"connected"}
 ```
@@ -40,7 +40,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/ready"
 curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" \
   -H 'Content-Type: application/json' \
   -d '{"question":"Hello"}'
-# Expected: 401
+# Output: 401
 ```
 
 ### 4. API Test có API Key hợp lệ (`POST /ask` → HTTP 200)
@@ -49,7 +49,11 @@ curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" \
   -H 'Content-Type: application/json' \
   -H "X-API-Key: $AGENT_API_KEY" \
   -d '{"question":"Hello"}'
-# Expected: 200
+# Output: 200
+```
+**Response JSON thực tế:**
+```json
+{"question":"What is deployment?","answer":"Deployment là quá trình đưa code từ máy bạn lên server để người khác dùng được.","user_id":"anonymous","cost_usd":2.01e-05}
 ```
 
 ## Environment Variables Set on Platform

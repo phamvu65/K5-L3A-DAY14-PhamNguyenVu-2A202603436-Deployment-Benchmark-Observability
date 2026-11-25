@@ -171,16 +171,16 @@ my-agent:advanced ->  57,409,152 bytes (~54.75 MB uncompressed  /   240 MB disk 
 ### Exercise 3.1 / 3.2: Triển khai Agent Part 6 (`06-lab-complete/`) lên Cloud (Render Blueprint)
 
 - **Nền tảng triển khai:** Render (dùng Blueprint `render.yaml` khởi tạo đồng thời Docker Web Service `k5-day14-production-agent` từ thư mục `06-lab-complete/` và Managed Redis `k5-day14-redis`).
-- **Public URL đang hoạt động:** https://k5-day14-production-agent.onrender.com
-- **Kết quả kiểm thử trực tiếp trên Public URL:**
-  - `GET https://k5-day14-production-agent.onrender.com/health` → **HTTP 200 OK** (`{"status":"ok","environment":"production"}`)
-  - `GET https://k5-day14-production-agent.onrender.com/ready` → **HTTP 200 OK** (`{"status":"ready","redis":"connected"}`)
-  - `POST https://k5-day14-production-agent.onrender.com/ask` (không gửi `X-API-Key`) → **HTTP 401 Unauthorized**
-  - `POST https://k5-day14-production-agent.onrender.com/ask` (có gửi `X-API-Key`) → **HTTP 200 OK**
+- **Public URL đang hoạt động:** https://k5-day14-production-agent-m4nh.onrender.com
+- **Kết quả kiểm thử trực tiếp 4 lệnh tự kiểm CP6 trên Public URL:**
+  - `curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/health"` → **`200`** (`{"status":"ok","environment":"production"}`)
+  - `curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/ready"` → **`200`** (`{"status":"ready","redis":"connected"}`)
+  - `curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -d '{"question":"Hello"}'` → **`401`**
+  - `curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -H "X-API-Key: $AGENT_API_KEY" -d '{"question":"Hello"}'` → **`200`** (`{"question":"What is deployment?","answer":"Deployment là quá trình đưa code từ máy bạn lên server để người khác dùng được.","user_id":"anonymous","cost_usd":2.01e-05}`)
 - **Ảnh chụp minh chứng:**
-  - [screenshots/dashboard.png](screenshots/dashboard.png) (Render Blueprint `k5-day14-agent` đồng bộ thành công cả `k5-day14-redis` và `k5-day14-production-agent`)
-  - [screenshots/running.png](screenshots/running.png) (`/health` trả về 200 OK trên Render)
-  - [screenshots/test.png](screenshots/test.png) (`/ready` trả về `{"status":"ready","redis":"connected"}`)
+  - [screenshots/dashboard.png](screenshots/dashboard.png) (Render Web Service Dashboard `k5-day14-production-agent` trạng thái `Live`)
+  - [screenshots/running.png](screenshots/running.png) (Render Application Logs ghi log JSON hợp lệ cho từng request)
+  - [screenshots/test.png](screenshots/test.png) (Kết quả chạy 4 lệnh `curl` kiểm thử `200`, `200`, `401`, `200` trên domain Render mà không lộ API key)
 - **Thông tin chi tiết:** Xem thêm tại file [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
