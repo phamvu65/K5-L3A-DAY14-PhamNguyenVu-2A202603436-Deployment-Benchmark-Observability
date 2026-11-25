@@ -1,0 +1,33 @@
+# ============================================================
+# Cấu hình deploy Render Blueprint ở gốc repo (trỏ vào 06-lab-complete)
+# ============================================================
+services:
+  - type: web
+    name: k5-day14-production-agent
+    runtime: docker
+    rootDir: 06-lab-complete
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: AGENT_API_KEY
+        generateValue: true
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "10"
+      - key: DAILY_BUDGET_USD
+        value: "1.0"
+      - key: MONTHLY_BUDGET_USD
+        value: "10.0"
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: k5-day14-redis
+          property: connectionString
+
+  - type: redis
+    name: k5-day14-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
